@@ -78,13 +78,18 @@
 			<artifactId>spring-boot-starter-webmvc-test</artifactId>
 			<scope>test</scope>
 		</dependency>
-	</dependencies>
+		<dependency>
+     		<groupId>com.okta.jwt</groupId>
+     		<artifactId>okta-jwt-verifier</artifactId>
+     		<version>0.5.12</version>
+   		</dependency>
+ </dependencies>
 
 	<build>
 		<plugins>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
+ 			<artifactId>spring-boot-maven-plugin</artifactId>
 			</plugin>
 		</plugins>
 	</build>
