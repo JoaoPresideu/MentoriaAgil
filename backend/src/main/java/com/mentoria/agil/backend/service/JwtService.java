@@ -3,44 +3,37 @@ package com.mentoria.agil.backend.service;
 import java.util.Date;
 import javax.crypto.SecretKey;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
+
+import com.mentoria.agil.backend.interfaces.service.TokenServiceInterface;
 import com.mentoria.agil.backend.model.User;
-import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
 
 @Service
-public class JwtService {
+public class JwtService implements TokenServiceInterface {
 
     @Value("${api.security.token.secret}")
     private String secretKey;
-
-    private final TokenBlacklistService tokenBlacklistService;
-
-    public JwtService(@Lazy TokenBlacklistService tokenBlacklistService) {
-        this.tokenBlacklistService = tokenBlacklistService;
-    }
 
     private SecretKey getSigningKey() {
         return Keys.hmacShaKeyFor(secretKey.getBytes());
     }
 
+    @Override
     public String generateToken(User user) {
         return Jwts.builder()
                 .subject(user.getEmail())
                 .claim("role", user.getRole())
                 .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 86400000))
+                .expiration(new Date(System.currentTimeMillis() + 86400000)) // 24h
                 .signWith(getSigningKey())
                 .compact();
     }
 
-    public String validateTokenAndGetSubject(String token) {
-        if (tokenBlacklistService.isTokenBlacklisted(token)) {
-            return null;
-        }
+    @Override
+    public String getSubjectFromToken(String token) {
         try {
             return Jwts.parser()
                     .verifyWith(getSigningKey())
@@ -48,21 +41,22 @@ public class JwtService {
                     .parseSignedClaims(token)
                     .getPayload()
                     .getSubject();
-        } catch (JwtException | IllegalArgumentException e) {
+        } catch (JwtException e) {
             return null;
         }
     }
 
+    @Override
     public Date getExpirationFromToken(String token) {
         try {
-            Claims claims = Jwts.parser()
+            return Jwts.parser()
                     .verifyWith(getSigningKey())
                     .build()
                     .parseSignedClaims(token)
-                    .getPayload();
-            return claims.getExpiration();
+                    .getPayload()
+                    .getExpiration();
         } catch (JwtException e) {
-            return new Date(System.currentTimeMillis() + 3600000);
+            return new Date(0); // Já expirado
         }
     }
 }
