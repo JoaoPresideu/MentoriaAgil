@@ -4,6 +4,7 @@ import com.mentoria.agil.backend.model.TipoMaterial;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.util.List;
 
 public class MaterialRequestDTO {
 
@@ -21,13 +22,16 @@ public class MaterialRequestDTO {
     @Size(max = 500, message = "O conteúdo/link deve ter no máximo 500 caracteres")
     private String conteudo;
 
+    private List<Long> mentoradosIds;
+
     public MaterialRequestDTO() {}
 
-    public MaterialRequestDTO(String titulo, String descricao, TipoMaterial tipo, String conteudo) {
+    public MaterialRequestDTO(String titulo, String descricao, TipoMaterial tipo, String conteudo, List<Long> mentoradosIds) {
         this.titulo = titulo;
         this.descricao = descricao;
         this.tipo = tipo;
         this.conteudo = conteudo;
+        this.mentoradosIds = mentoradosIds;
     }
 
     public String getTitulo() {
@@ -60,5 +64,13 @@ public class MaterialRequestDTO {
 
     public void setConteudo(String conteudo) {
         this.conteudo = conteudo;
+    }
+
+    public List<Long> getMentoradosIds() {
+        return mentoradosIds;
+    }
+
+    public void setMentoradosIds(List<Long> mentoradosIds) {
+        this.mentoradosIds = mentoradosIds;
     }
 }
